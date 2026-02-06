@@ -7,14 +7,14 @@ dotenv.config();  // Load .env
 const app = express()
 
 app.use(cors({
-  origin: "https://blogblitz-gamma.vercel.app",
+  origin:process.env.CORS_ORIGIN,
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 
-app.options("*", cors());
+
 
 
 app.use(express.json());   
