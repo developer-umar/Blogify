@@ -8,25 +8,26 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 const generateAcessTokenAndRefreshTokens = async (userId) => {
 
 
-    try {
-        const user = await User.findById(userId);
+  try {
+    const user = await User.findById(userId);
 
-        const acessToken =await  user.generateAcessToken();
-        const refreshToken = await  user.generateRefreshToken();
+    const acessToken = await user.generateAcessToken();
+    const refreshToken = await user.generateRefreshToken();
 
-        user.refreshToken = refreshToken;
-
-
-        return { acessToken, refreshToken };
+    user.refreshToken = refreshToken;
 
 
+    return { acessToken, refreshToken };
+    await user.save({validateBeforeSave:false})
 
-    } catch (error) {
 
 
-        throw new ApiError(400, "something went wrong in generating acess and refresh tokens ");
+  } catch (error) {
 
-    }
+
+    throw new ApiError(400, "something went wrong in generating acess and refresh tokens ");
+
+  }
 
 
 }
@@ -100,36 +101,36 @@ export const registerUser = asyncHandler(async (req, res) => {
 
 export const loginUser = asyncHandler(async (req, res) => {
 
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    if (!(email)) {
-        throw new ApiError(401, "email  and is required ")
-    }
+  if (!(email)) {
+    throw new ApiError(401, "email  and is required ")
+  }
 
-    const user = await User.findOne({
-        $or: [{ email }]
-    })
-
-
-    if (!user) {
-        throw new ApiError(404, "User does not exists  please register ")
-    }
+  const user = await User.findOne({
+    $or: [{ email }]
+  })
 
 
-    const isPasswordValid = await user.isPasswordCorrect(password);
-
-    if (!isPasswordValid) {
-        throw new ApiError(409, "invalid password  try again ")
-
-    }
-
-    const { acessToken, refreshToken } = await generateAcessTokenAndRefreshTokens(user._id);
+  if (!user) {
+    throw new ApiError(404, "User does not exists  please register ")
+  }
 
 
-    const LoggedInUser = await User.findById(user._id).select("-password -refreshToken");
+  const isPasswordValid = await user.isPasswordCorrect(password);
+
+  if (!isPasswordValid) {
+    throw new ApiError(409, "invalid password  try again ")
+
+  }
+
+  const { acessToken, refreshToken } = await generateAcessTokenAndRefreshTokens(user._id);
 
 
-    const options = {
+  const LoggedInUser = await User.findById(user._id).select("-password -refreshToken");
+
+
+  const options = {
     httpOnly: true,
     secure: true,
     sameSite: "none",
@@ -137,10 +138,10 @@ export const loginUser = asyncHandler(async (req, res) => {
     maxAge: 7 * 24 * 60 * 60 * 1000,
   };
 
-    return res.status(200)
-    .cookie("accessToken",acessToken,options)
-    .cookie("refreshToken",refreshToken,options)
-    .json(new ApiResponse(200,LoggedInUser,"user logged in sueceesfully"))
+  return res.status(200)
+    .cookie("accessToken", acessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(new ApiResponse(200, LoggedInUser, "user logged in sueceesfully"))
 
 })
 // logout user 
@@ -153,8 +154,12 @@ export const logoutUser = asyncHandler(async (req, res) => {
 
 
   const options = {
+
     httpOnly: true,
-    secure: true
+    secure: true,
+    sameSite: "none",
+    path: "/"
+
   }
 
   return res
@@ -169,9 +174,9 @@ export const logoutUser = asyncHandler(async (req, res) => {
 // acces refresh token 
 export const getCurrentUser = asyncHandler(async (req, res) => {
 
- return res.status(200).json(
-  new ApiResponse(200, req.user, "Current user fetched successfully")
-);
+  return res.status(200).json(
+    new ApiResponse(200, req.user, "Current user fetched successfully")
+  );
 })
 
 
@@ -210,13 +215,13 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
 
     const { accessToken, refreshToken } = await generateAcessTokenAndRefreshTokens(user._id);
 
-    const updateduser = await   User.findById(user._id).select("-password -refreshToken")
+    const updateduser = await User.findById(user._id).select("-password -refreshToken")
 
 
     const options = {
-      httpOnly: true, 
+      httpOnly: true,
       secure: true
-    //   secure: process.env.NODE_ENV === "production"  
+      //   secure: process.env.NODE_ENV === "production"  
     }
     return res
       .status(200)
