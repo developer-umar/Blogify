@@ -11,41 +11,8 @@ cloudinary.config({
     api_secret:process.env.CLOUDINARY_API_SECRET
 });
 
-// export const    uploadonCloudinary = async(localFilePath)=>{
 
 
-//     try {
-
-//         if(!localFilePath)   return null;
-
-
-//         const response =  await cloudinary.uploader.upload(localFilePath,{
-//             resource_type:"auto"
-//         })
-
-//          if(response){
-//             console.log("file uploaded on cloudinary..... ")
-//          }
-
-//           fs.unlinkSync(localFilePath)
-
-
-//          return  response;
-
-
-        
-//     } catch (error) {
-
-//           if (fs.existsSync(localFilePath)) {
-//         fs.unlinkSync(localFilePath);
-//     }
-        
-//         console.log("file not !!! uploaded  on  clouidnary...")
-//         return null;
-//     }
-        
-    
-// }
 
 // oopr walal code local file path se upload kar rha tha render pr nhi ho paa rha tha ku ki uslo temp folder nhi mil rha isliye ye use karna pada 
 
